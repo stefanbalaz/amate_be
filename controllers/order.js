@@ -1,7 +1,6 @@
 const Order = require("../schemas/order");
 const Partner = require("../schemas/partner");
 
-//create order and pushes new order to partner
 const createOrder = async (req, res) => {
   console.log("BODY", req.body);
   try {
@@ -28,8 +27,7 @@ const createOrder = async (req, res) => {
     });
 
     if (order) {
-      // Assuming you're associating the order with a partner
-      const partnerId = orderPartner[0].ID; // Assuming ID is in the correct format within orderPartner
+      const partnerId = orderPartner.ID;
       const partner = await Partner.findByIdAndUpdate(partnerId, {
         $push: { partnerOrders: order._id },
       });

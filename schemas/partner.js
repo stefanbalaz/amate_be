@@ -2,38 +2,37 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const partnerSchema = new Schema({
-  partnerRegistration: [
-    {
-      gender: {
-        type: String,
-        enum: ["female", "male", "undefined"],
-      },
-      salutation: {
-        type: String,
-      },
-      forename: {
-        type: String,
-      },
-      surname: {
-        type: String,
-      },
-      companyName: {
-        type: String,
-      },
-      phoneNumber: {
-        type: String,
-      },
-      email: {
-        type: String,
-        required: true,
-        unique: true,
-      },
-      password: {
-        type: String,
-        required: true,
-      },
+  partnerRegistration: {
+    _id: false,
+    gender: {
+      type: String,
+      enum: ["female", "male", "undefined"],
     },
-  ],
+    salutation: {
+      type: String,
+    },
+    forename: {
+      type: String,
+    },
+    surname: {
+      type: String,
+    },
+    companyName: {
+      type: String,
+    },
+    phoneNumber: {
+      type: String,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+  },
   partnerDisplayName: {
     type: String,
   },
@@ -65,6 +64,7 @@ const partnerSchema = new Schema({
   },
   partnerProductPrice: [
     {
+      _id: false,
       drinkNet: {
         type: Number,
         required: true,
@@ -120,6 +120,7 @@ const partnerSchema = new Schema({
   ],
   partnerDeliveryAddress: [
     {
+      _id: false,
       gender: {
         type: String,
         enum: ["female", "male", "undefined"],
@@ -164,6 +165,7 @@ const partnerSchema = new Schema({
   ],
   partnerBillingAddress: [
     {
+      _id: false,
       gender: {
         type: String,
         enum: ["female", "male", "undefined"],
@@ -217,6 +219,7 @@ const partnerSchema = new Schema({
   ],
   partnerOrders: [
     {
+      _id: false,
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
     },

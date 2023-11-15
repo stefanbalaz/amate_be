@@ -2,29 +2,8 @@ const Partner = require("../schemas/partner");
 
 const createPartner = async (req, res) => {
   try {
-    const {
-      partnerRegistration,
-      partnerDisplayName,
-      partnerRole,
-      partnerRelationType,
-      partnerBusinessType,
-      partnerNote,
-      partnerProductPrice,
-      partnerDeliveryAddress,
-      partnerBillingAddress,
-    } = req.body;
-
-    const partner = await Partner.create({
-      partnerRegistration,
-      partnerDisplayName,
-      partnerRole,
-      partnerRelationType,
-      partnerBusinessType,
-      partnerNote,
-      partnerProductPrice,
-      partnerDeliveryAddress,
-      partnerBillingAddress,
-    });
+    const newPartner = new Partner(req.body);
+    const partner = await newPartner.save();
 
     res.status(201).json({ success: true, data: partner });
   } catch (error) {

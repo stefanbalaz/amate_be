@@ -2,17 +2,15 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const orderSchema = new Schema({
-  orderPartner: [
-    {
-      ID: {
-        type: Schema.Types.ObjectId,
-        ref: "Partner",
-      },
-      orderNumber: {
-        type: String,
-      },
+  orderPartner: {
+    ID: {
+      type: Schema.Types.ObjectId,
+      ref: "Partner",
     },
-  ],
+    externalOrderNumber: {
+      type: String,
+    },
+  },
   orderStatus: {
     type: String,
     default: "preliminary_order",
@@ -41,89 +39,81 @@ const orderSchema = new Schema({
   orderNote: {
     type: String,
   },
-  orderPayment: [
-    {
-      method: {
-        type: String,
-        enum: [
-          "bank_transfer",
-          "cash",
-          "free_of_charge",
-          "internal_transaction",
-        ],
-      },
-      record: {
-        type: String,
-        enum: [
-          "invoice",
-          "cash_receipt",
-          "promotion",
-          "missing_document",
-          "internal_transaction",
-        ],
-      },
-      recordIssuanceDate: {
-        type: Date,
-      },
-      invoiceNumber: {
-        type: String,
-      },
-      dueDate: {
-        type: Date,
-      },
-      status: {
-        type: String,
-        default: "unpaid",
-        enum: [
-          "paid",
-          "unpaid",
-          "free",
-          "long-term debt",
-          "first reminder sent",
-          "second reminder sent",
-        ],
-      },
-      reminderSentDate: {
-        type: Date,
-      },
-      receivedDate: {
-        type: Date,
-      },
+  orderPayment: {
+    method: {
+      type: String,
+      enum: ["bank_transfer", "cash", "free_of_charge", "internal_transaction"],
     },
-  ],
-  orderDelivery: [
-    {
-      method: {
-        type: String,
-        enum: [
-          "manufacturer_delivery",
-          "warehouse_pickup",
-          "manufacturer_shop",
-          "external_carrier",
-        ],
-      },
-      methodDetail: {
-        type: String,
-        enum: [
-          "warehouse_ba",
-          "warehouse_zm",
-          "warehouse_po",
-          "bike_courier",
-          "rf_pack",
-          "foxlog",
-        ],
-      },
-      date: {
-        type: Date,
-      },
-      region: {
-        type: String,
-        enum: ["BA", "PO"],
-      },
+    record: {
+      type: String,
+      enum: [
+        "invoice",
+        "cash_receipt",
+        "promotion",
+        "missing_document",
+        "internal_transaction",
+      ],
     },
-  ],
+    recordIssuanceDate: {
+      type: Date,
+    },
+    invoiceNumber: {
+      type: String,
+    },
+    dueDate: {
+      type: Date,
+    },
+    status: {
+      type: String,
+      default: "unpaid",
+      enum: [
+        "paid",
+        "unpaid",
+        "free",
+        "long-term debt",
+        "first reminder sent",
+        "second reminder sent",
+      ],
+    },
+    reminderSentDate: {
+      type: Date,
+    },
+    receivedDate: {
+      type: Date,
+    },
+  },
+  orderDelivery: {
+    method: {
+      type: String,
+      enum: [
+        "manufacturer_delivery",
+        "warehouse_pickup",
+        "manufacturer_shop",
+        "external_carrier",
+      ],
+    },
+    methodDetail: {
+      type: String,
+      enum: [
+        "warehouse_ba",
+        "warehouse_zm",
+        "warehouse_po",
+        "bike_courier",
+        "rf_pack",
+        "foxlog",
+      ],
+    },
+    date: {
+      type: Date,
+    },
+    region: {
+      type: String,
+      enum: ["BA", "PO"],
+    },
+  },
   orderProduct: [
     {
+      _id: false,
       ID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
@@ -142,38 +132,36 @@ const orderSchema = new Schema({
       },
     },
   ],
-  orderPackaging: [
-    {
-      containerMedium: {
-        type: String,
-        enum: ["glass", "plastic"],
-        default: "glass",
-        required: true,
-      },
-      containerMediumReceiptAmount: {
-        type: Number,
-      },
-      transportMedium: {
-        type: String,
-        enum: ["crate", "cardboard"],
-      },
-      unitsPerTransportMedium: {
-        type: Number,
-      },
-      transportMediumIssuanceAmount: {
-        type: Number,
-      },
-      transportMediumReceiptAmount: {
-        type: Number,
-      },
-      palletIssuanceAmount: {
-        type: Number,
-      },
-      palletReceiptAmount: {
-        type: Number,
-      },
+  orderPackaging: {
+    containerMedium: {
+      type: String,
+      enum: ["glass", "plastic"],
+      default: "glass",
+      required: true,
     },
-  ],
+    containerMediumReceiptAmount: {
+      type: Number,
+    },
+    transportMedium: {
+      type: String,
+      enum: ["crate", "cardboard"],
+    },
+    unitsPerTransportMedium: {
+      type: Number,
+    },
+    transportMediumIssuanceAmount: {
+      type: Number,
+    },
+    transportMediumReceiptAmount: {
+      type: Number,
+    },
+    palletIssuanceAmount: {
+      type: Number,
+    },
+    palletReceiptAmount: {
+      type: Number,
+    },
+  },
 });
 
 module.exports = mongoose.model("Order", orderSchema);
