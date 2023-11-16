@@ -12,7 +12,7 @@ app.use(express.json());
 require("colors");
 const orderRoutes = require("./routes/order");
 const partnerRoutes = require("./routes/partner");
-//const productRoutes = require("./routes/product");
+const productRoutes = require("./routes/product");
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 
 app.use("/order", orderRoutes);
 app.use("/partner", partnerRoutes);
-//app.use("/product", productRoutes);
+app.use("/product", productRoutes);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
