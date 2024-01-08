@@ -28,6 +28,9 @@ const partnerSchema = new Schema({
       required: true,
       unique: true,
     },
+    web: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
@@ -64,7 +67,7 @@ const partnerSchema = new Schema({
   },
   partnerProductPrice: [
     {
-      _id: false,
+      // _id: false,
       drinkNet: {
         type: Number,
         required: true,
@@ -111,16 +114,15 @@ const partnerSchema = new Schema({
         type: Date,
         default: Date.now,
       },
-      status: {
-        type: String,
-        enum: ["active", "notActive"],
-        default: "active",
+      active: {
+        type: Boolean,
+        default: true,
       },
     },
   ],
   partnerDeliveryAddress: [
     {
-      _id: false,
+      // _id: false,
       gender: {
         type: String,
         enum: ["female", "male", "undefined"],
@@ -146,6 +148,9 @@ const partnerSchema = new Schema({
       streetNameNumber: {
         type: String,
       },
+      zipCode: {
+        type: String,
+      },
       city: {
         type: String,
       },
@@ -156,16 +161,15 @@ const partnerSchema = new Schema({
         type: Date,
         default: Date.now,
       },
-      status: {
-        type: String,
-        enum: ["active", "notActive"],
-        default: "active",
+      active: {
+        type: Boolean,
+        default: true,
       },
     },
   ],
   partnerBillingAddress: [
     {
-      _id: false,
+      // _id: false,
       gender: {
         type: String,
         enum: ["female", "male", "undefined"],
@@ -191,6 +195,9 @@ const partnerSchema = new Schema({
       streetNameNumber: {
         type: String,
       },
+      zipCode: {
+        type: String,
+      },
       city: {
         type: String,
       },
@@ -201,10 +208,9 @@ const partnerSchema = new Schema({
         type: Date,
         default: Date.now,
       },
-      status: {
-        type: String,
-        enum: ["active", "notActive"],
-        default: "active",
+      active: {
+        type: Boolean,
+        default: true,
       },
       taxID: {
         type: String,
@@ -215,8 +221,20 @@ const partnerSchema = new Schema({
       businessID: {
         type: String,
       }, // IČO
+      bankName: {
+        type: String,
+      },
+      IBAN: {
+        type: String,
+      },
+      BIC: {
+        type: String,
+      },
     },
   ],
+  internalMerchantID: {
+    type: String,
+  },
   partnerOrders: [
     {
       _id: false,

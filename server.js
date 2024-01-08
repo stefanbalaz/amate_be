@@ -13,6 +13,7 @@ require("colors");
 const orderRoutes = require("./routes/order");
 const partnerRoutes = require("./routes/partner");
 const productRoutes = require("./routes/product");
+const merchantRoutes = require("./routes/merchant");
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 app.use("/order", orderRoutes);
 app.use("/partner", partnerRoutes);
 app.use("/product", productRoutes);
+app.use("/merchant", merchantRoutes);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

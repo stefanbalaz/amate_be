@@ -1,8 +1,11 @@
 const Order = require("../schemas/order");
 const Partner = require("../schemas/partner");
+const Merchant = require("../schemas/merchant");
+const { generateOrderNumber } = require("../modules/orderNumber");
+const _ = require("lodash");
 
 const createOrder = async (req, res) => {
-  console.log("BODY", req.body);
+  //  console.log("BODY", req.body);
   try {
     const {
       orderPartner,
@@ -13,32 +16,102 @@ const createOrder = async (req, res) => {
       orderDelivery,
       orderProduct,
       orderPackaging,
+      orderMerchant,
     } = req.body;
 
+    const orderNumberInput = await generateOrderNumber();
+
+    // Fetch partner to filter active addresses
+    const partner = await Partner.findById(orderPartner.ID);
+
+    if (!partner) {
+      return res.status(404).json({ error: "Partner not found" });
+    }
+
+    // Fetch merchant to filter active billing address
+    const merchant = await Merchant.findById(orderMerchant.ID);
+
+    if (!merchant) {
+      return res.status(404).json({ error: "Merchant not found" });
+    }
+
+    // Find the registration data
+    // const partnerRegistration = partner.partnerRegistration;
+
+    // Filter active delivery addresses
+    const activeDeliveryAddress = partner.partnerDeliveryAddress.find(
+      (address) => address.active === true
+    );
+
+    // Filter active billing addresses
+    const activeBillingAddress = partner.partnerBillingAddress.find(
+      (address) => address.active === true
+    );
+
+    // Filter active price
+    const activePrice = partner.partnerProductPrice.find(
+      (price) => price.active === true
+    );
+
+    // Filter active merchant billing address
+    const activeMerchantBillingAddress = merchant.merchantBillingAddress.find(
+      (address) => address.active === true
+    );
+
+    const orderDeliveryExtended = {
+      method: orderDelivery.method,
+      methodDetail: orderDelivery.methodDetail,
+      date: orderDelivery.date,
+      region: orderDelivery.region,
+      orderDeliveryAddressId: activeDeliveryAddress
+        ? activeDeliveryAddress._id
+        : null,
+    };
+
+    const orderPaymentExtended = {
+      method: orderPayment.method,
+      record: orderPayment.record,
+      recordIssuanceDate: orderPayment.recordIssuanceDate,
+      invoiceNumber: orderPayment.invoiceNumber,
+      dueDate: orderPayment.dueDate,
+      status: orderPayment.status,
+      orderPartnerBillingAddressId: activeBillingAddress
+        ? activeBillingAddress._id
+        : null,
+      partnerProductPriceId: activePrice ? activePrice._id : null,
+    };
+
+    const orderMerchantExtended = {
+      ID: orderMerchant.ID,
+      merchantBillingAddressId: activeMerchantBillingAddress
+        ? activeMerchantBillingAddress._id
+        : null,
+    };
+
     const order = await Order.create({
-      orderPartner,
+      orderNumber: orderNumberInput,
+      orderPartner: {
+        ID: orderPartner.ID,
+        externalOrderNumber: orderPartner.externalOrderNumber,
+      },
       orderStatus,
       orderCreationDate,
       orderNote,
-      orderPayment,
-      orderDelivery,
+      orderPayment: orderPaymentExtended,
+      orderDelivery: orderDeliveryExtended,
       orderProduct,
       orderPackaging,
+      orderMerchant: orderMerchantExtended,
     });
 
     if (order) {
-      const partnerId = orderPartner.ID;
-      const partner = await Partner.findByIdAndUpdate(partnerId, {
+      await Partner.findByIdAndUpdate(orderPartner.ID, {
         $push: { partnerOrders: order._id },
       });
 
-      if (partner) {
-        console.log("controller partner", partner);
-        console.log("controller order", order);
-        res.status(201).json(order);
-      } else {
-        res.status(404).json({ error: "Partner not found" });
-      }
+      //      console.log("controller partner", partner);
+      //      console.log("controller order", order);
+      res.status(201).json(order);
     } else {
       res.status(400).json({ error: "Failed to create order" });
     }
@@ -56,7 +129,193 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const getOneOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId; // Assuming the route parameter is named "orderId"
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+/* 
+const updateOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const updateFields = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const updateNestedField = (obj, fieldsToUpdate) => {
+      for (const key in fieldsToUpdate) {
+        if (typeof fieldsToUpdate[key] === "object" && obj[key]) {
+          updateNestedField(obj[key], fieldsToUpdate[key]);
+        } else if (obj[key] !== undefined) {
+          obj[key] = fieldsToUpdate[key];
+        }
+      }
+    };
+
+    updateNestedField(order.orderPayment, updateFields);
+
+    await order.save();
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
+  getOneOrder,
+  updateOrder,
+};
+
+ */
+
+/* 
+status updated and invoice number not
+const updateOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const updateFields = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const updateNestedField = (obj, fieldsToUpdate) => {
+      for (const key in fieldsToUpdate) {
+        if (typeof fieldsToUpdate[key] === "object" && obj[key]) {
+          updateNestedField(obj[key], fieldsToUpdate[key]);
+        } else if (obj[key] !== undefined) {
+          obj[key] = fieldsToUpdate[key];
+        }
+      }
+    };
+
+    updateNestedField(order, updateFields); // Update fields within the order itself
+
+    await order.save();
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createOrder,
+  getAllOrders,
+  getOneOrder,
+  updateOrder,
+};
+ */
+
+/* const updateOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const updateFields = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const updateNestedFields = (obj, fieldsToUpdate) => {
+      for (const key in fieldsToUpdate) {
+        if (typeof fieldsToUpdate[key] === "object" && obj[key]) {
+          updateNestedFields(obj[key], fieldsToUpdate[key]);
+        } else if (obj[key] !== undefined) {
+          obj[key] = fieldsToUpdate[key];
+        }
+      }
+    };
+
+    // Update orderStatus
+    if (updateFields.orderStatus) {
+      order.orderStatus = updateFields.orderStatus;
+    }
+
+    // Update nested properties (e.g., invoiceNumber)
+    updateNestedFields(order.orderPayment, updateFields);
+
+    await order.save();
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createOrder,
+  getAllOrders,
+  getOneOrder,
+  updateOrder,
+};
+ */
+
+const updateOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const updateFields = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const updateNestedFields = (obj, fieldsToUpdate) => {
+      for (const key in fieldsToUpdate) {
+        if (typeof fieldsToUpdate[key] === "object" && obj[key]) {
+          updateNestedFields(obj[key], fieldsToUpdate[key]);
+        } else if (obj[key] !== undefined) {
+          obj[key] = fieldsToUpdate[key];
+        }
+      }
+    };
+
+    // Update orderStatus
+    if (updateFields.orderStatus) {
+      order.orderStatus = updateFields.orderStatus;
+    }
+
+    // Update orderPayment.status specifically
+    if (updateFields.orderPayment && updateFields.orderPayment.status) {
+      order.orderPayment.status = updateFields.orderPayment.status;
+    }
+
+    // Update other nested properties if needed
+    updateNestedFields(order.orderPayment, updateFields);
+
+    await order.save();
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createOrder,
+  getAllOrders,
+  getOneOrder,
+  updateOrder,
 };

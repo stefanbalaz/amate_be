@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const orderSchema = new Schema({
+  orderNumber: {
+    type: String,
+    unique: true,
+  },
   orderPartner: {
     ID: {
       type: Schema.Types.ObjectId,
@@ -10,6 +14,10 @@ const orderSchema = new Schema({
     externalOrderNumber: {
       type: String,
     },
+    /*     partnerRegistration: {
+      type: Schema.Types.Mixed,
+      ref: "Partner.partnerRegistration",
+    }, */
   },
   orderStatus: {
     type: String,
@@ -70,9 +78,10 @@ const orderSchema = new Schema({
         "paid",
         "unpaid",
         "free",
-        "long-term debt",
-        "first reminder sent",
-        "second reminder sent",
+        "long_term_debt",
+        "first_reminder_sent",
+        "second_reminder_sent",
+        "internal_transaction",
       ],
     },
     reminderSentDate: {
@@ -80,6 +89,14 @@ const orderSchema = new Schema({
     },
     receivedDate: {
       type: Date,
+    },
+    orderPartnerBillingAddressId: {
+      type: Schema.Types.ObjectId,
+      ref: "Partner.partnerBillingAddress",
+    },
+    partnerProductPriceId: {
+      type: Schema.Types.ObjectId,
+      ref: "Partner.partnerProductPrice",
     },
   },
   orderDelivery: {
@@ -110,6 +127,10 @@ const orderSchema = new Schema({
       type: String,
       enum: ["BA", "PO"],
     },
+    orderDeliveryAddressId: {
+      type: Schema.Types.ObjectId,
+      ref: "Partner.partnerDeliveryAddress",
+    },
   },
   orderProduct: [
     {
@@ -120,6 +141,7 @@ const orderSchema = new Schema({
       },
       quantity: {
         type: Number,
+        default: 0,
         required: true,
       },
       batchID: {
@@ -160,6 +182,20 @@ const orderSchema = new Schema({
     },
     palletReceiptAmount: {
       type: Number,
+    },
+  },
+  orderMerchant: {
+    ID: {
+      type: Schema.Types.ObjectId,
+      ref: "Merchant",
+    },
+    /*     merchantRegistration: {
+      type: Schema.Types.Mixed,
+      ref: "Merchant.merchantRegistration",
+    }, */
+    merchantBillingAddressId: {
+      type: Schema.Types.ObjectId,
+      ref: "Merchant.merchantBillingAddress",
     },
   },
 });
