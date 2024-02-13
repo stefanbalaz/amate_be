@@ -17,6 +17,9 @@ const partnerSchema = new Schema({
     surname: {
       type: String,
     },
+    userName: {
+      type: String,
+    },
     companyName: {
       type: String,
     },
