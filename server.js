@@ -20,7 +20,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/order", orderRoutes);
-app.use("/partner", partnerRoutes);
+app.use("/sign-up", partnerRoutes);
+/* app.use("/partner", partnerRoutes); */
 app.use("/product", productRoutes);
 app.use("/merchant", merchantRoutes);
 

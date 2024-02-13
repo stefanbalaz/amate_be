@@ -9,8 +9,12 @@ const {
 const app = express.Router();
 
 /* app.route("/").post(createPartner).get(getAllPartners); */
-app.route("/").post(createPartner);
-app.route("/register").post(registerPartner);
+
+/* app.route("/").post(createPartner);
+app.route("/register").post(registerPartner); */
+app.route("/abc").post(createPartner);
+app.route("/").post(registerPartner);
+
 app.route("/login").post(loginPartner);
 app.route("/").get(getAllPartners);
 app.route("/:id").get(getPartnerById);
