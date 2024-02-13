@@ -46,12 +46,12 @@ const partnerSchema = new Schema({
     type: String,
     enum: ["admin", "customer", "employee"],
     default: "customer",
-    required: true,
+    /* required: true, */
   },
   partnerRelationType: {
     type: String,
     enum: ["private", "business"],
-    required: true,
+    /* required: true, */
   },
   partnerBusinessType: {
     type: String,
