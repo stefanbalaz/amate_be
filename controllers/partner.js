@@ -1,5 +1,25 @@
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 const Partner = require("../schemas/partner");
+const jwt = require("jsonwebtoken");
+const secretKey = process.env.SECRET;
+
+const generateToken = (user) => {
+  const payload = {
+    userId: user._id,
+    userName: user.partnerRegistration.userName,
+    email: user.partnerRegistration.email,
+    // Add other user-related information as needed
+  };
+
+  const options = {
+    expiresIn: "1d",
+  };
+
+  const token = jwt.sign(payload, secretKey, options);
+
+  return token;
+};
 
 const createPartner = async (req, res) => {
   try {
@@ -203,14 +223,16 @@ const registerPartner = async (req, res) => {
 
     const partner = await newPartner.save();
 
-    // Create the modified response object
+    // Generate a token for the new partner
+    const token = generateToken(partner);
+    console.log("token", token);
+    // Create the modified response object with the token
     const responseData = {
-      /* token: generateToken(partner), */
-      // Implement your token generation logic
+      token,
       user: {
         userName: partner.partnerRegistration.userName,
         authority: ["USER"],
-        avatar: "", // Add avatar if available
+        avatar: "",
         email: partner.partnerRegistration.email,
       },
     };
@@ -275,6 +297,7 @@ const getPartnerById = async (req, res) => {
 };
 
 module.exports = {
+  generateToken,
   createPartner,
   registerPartner,
   loginPartner,
