@@ -166,7 +166,7 @@ const createPartner = async (req, res) => {
 
 const registerPartner = async (req, res) => {
   try {
-    const { userName, email, password } = req.body.partnerRegistration || {};
+    const { userName, email, password } = req.body || {};
 
     if (!userName || !email || !password) {
       return res
