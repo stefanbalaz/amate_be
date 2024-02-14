@@ -205,7 +205,8 @@ const registerPartner = async (req, res) => {
 
     // Create the modified response object
     const responseData = {
-      token: generateToken(partner), // Implement your token generation logic
+      /* token: generateToken(partner), */
+      // Implement your token generation logic
       user: {
         userName: partner.partnerRegistration.userName,
         authority: ["USER"],
