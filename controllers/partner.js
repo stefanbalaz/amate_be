@@ -1,5 +1,4 @@
 const bcrypt = require("bcrypt");
-const validator = require("validator");
 const Partner = require("../schemas/partner");
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET;
