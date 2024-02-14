@@ -236,7 +236,8 @@ const registerPartner = async (req, res) => {
       },
     };
 
-    res.status(201).json({ success: true, data: responseData });
+    // res.status(201).json({ success: true, data: responseData });
+    res.status(201).json({ success: true, ...responseData });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
