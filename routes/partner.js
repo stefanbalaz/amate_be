@@ -12,9 +12,8 @@ const app = express.Router();
 
 /* app.route("/").post(createPartner);
 app.route("/register").post(registerPartner); */
-app.route("/abc").post(createPartner);
-app.route("/").post(registerPartner);
-
+app.route("/create").post(createPartner);
+app.route("/register").post(registerPartner);
 app.route("/login").post(loginPartner);
 app.route("/").get(getAllPartners);
 app.route("/:id").get(getPartnerById);
