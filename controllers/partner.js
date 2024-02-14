@@ -72,9 +72,54 @@ const createPartner = async (req, res) => {
   }
 }; */
 
-const registerPartner = async (req, res) => {
+/* const registerPartner = async (req, res) => {
   try {
     const { userName, email, password } = req.body.partnerRegistration || {};
+
+    if (!userName || !email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid request payload" });
+    }
+
+    // Check if the username or email already exists
+    const existingUser = await Partner.findOne({
+      $or: [
+        { "partnerRegistration.userName": userName },
+        { "partnerRegistration.email": email },
+      ],
+    });
+
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ success: false, error: "User already exists" });
+    }
+
+    // Hash the password before saving to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newPartner = new Partner({
+      partnerRegistration: {
+        userName,
+        email,
+        password: hashedPassword,
+      },
+      partnerRole: "customer",
+      partnerRelationType: "private",
+    });
+
+    const partner = await newPartner.save();
+
+    res.status(201).json({ success: true, data: partner });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}; */
+
+const registerPartner = async (req, res) => {
+  try {
+    const { userName, email, password } = req.body || {};
 
     if (!userName || !email || !password) {
       return res
