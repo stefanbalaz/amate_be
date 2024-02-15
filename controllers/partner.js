@@ -186,6 +186,11 @@ const loginPartner = async (req, res) => {
 
     console.log("Found user:", user);
 
+    console.log(
+      "Hashed received plain password:",
+      await bcrypt.hash(password, 10)
+    );
+
     // Log stored hashed password and received plain password
     console.log("Stored hashed password:", user.partnerRegistration.password);
     console.log("Received plain password:", password);
