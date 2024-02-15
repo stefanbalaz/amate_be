@@ -78,7 +78,7 @@ const registerPartner = async (req, res) => {
 
     // Generate a token for the new partner
     const token = generateToken(partner);
-    console.log("token", token);
+    console.log("Token SignUp:", token);
     // Create the modified response object with the token
     const responseData = {
       token,
@@ -105,10 +105,7 @@ const loginPartner = async (req, res) => {
 
     // Find the user by userName or email
     const user = await Partner.findOne({
-      $or: [
-        { "partnerRegistration.userName": userName },
-        { "partnerRegistration.email": userName },
-      ],
+      "partnerRegistration.userName": userName,
     });
 
     if (user) {
@@ -121,6 +118,7 @@ const loginPartner = async (req, res) => {
       if (passwordMatch) {
         // Passwords match, handle successful login
         const token = generateToken(user);
+        console.log("Token LogIn:", token);
         const responseData = {
           token,
           user: {
