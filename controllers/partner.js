@@ -74,6 +74,9 @@ const registerPartner = async (req, res) => {
       partnerRelationType: "private",
     });
 
+    console.log("Received plain password during registration:", password);
+    console.log("Stored hashed password during registration:", hashedPassword);
+
     const partner = await newPartner.save();
 
     // Generate a token for the new partner
@@ -111,6 +114,11 @@ const loginPartner = async (req, res) => {
     });
 
     console.log("Found user:", user);
+
+    console.log(
+      "Hashed received plain password:",
+      await bcrypt.hash(password, 10)
+    );
 
     if (user) {
       // Log stored hashed password and received plain password
