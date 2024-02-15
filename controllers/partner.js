@@ -144,6 +144,19 @@ const loginPartner = async (req, res) => {
   }
 };
 
+/* LOGOUT PARTNER */
+
+const logoutPartner = async (req, res) => {
+  try {
+    // In a token-based authentication system, the server doesn't typically store the tokens.
+    // The client removes or invalidates the token on the client side.
+    // You can send a success response to confirm that the client successfully logged out.
+    res.status(200).json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 /* GET ALL PARTNERS */
 
 const getAllPartners = async (req, res) => {
@@ -175,6 +188,7 @@ module.exports = {
   createPartner,
   registerPartner,
   loginPartner,
+  logoutPartner,
   getAllPartners,
   getPartnerById,
 };
