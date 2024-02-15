@@ -99,8 +99,6 @@ const registerPartner = async (req, res) => {
 
 /* LOGIN PARTNER */
 
-/* LOGIN PARTNER */
-
 const loginPartner = async (req, res) => {
   try {
     const { userName, password } = req.body;
@@ -115,6 +113,10 @@ const loginPartner = async (req, res) => {
     console.log("Found user:", user);
 
     if (user) {
+      // Log stored hashed password and received plain password
+      console.log("Stored hashed password:", user.partnerRegistration.password);
+      console.log("Received plain password:", password);
+
       // Compare the provided password with the stored hashed password
       const passwordMatch = await bcrypt.compare(
         password,
