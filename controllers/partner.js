@@ -102,6 +102,7 @@ const registerPartner = async (req, res) => {
 
 /* LOGIN PARTNER */
 
+/* 
 const loginPartner = async (req, res) => {
   try {
     const { userName, password } = req.body;
@@ -158,6 +159,62 @@ const loginPartner = async (req, res) => {
     } else {
       // User not found, handle login failure
       console.log("User not found. Sending response:", {
+        success: false,
+        error: "Invalid credentials",
+      });
+      res.status(401).json({ success: false, error: "Invalid credentials" });
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}; 
+*/
+
+/* LOGIN PARTNER */
+
+const loginPartner = async (req, res) => {
+  try {
+    const { userName, password } = req.body;
+
+    console.log("Received login request:", userName, password);
+
+    // Find the user by userName or email
+    const user = await Partner.findOne({
+      "partnerRegistration.userName": userName,
+    });
+
+    console.log("Found user:", user);
+
+    // Log stored hashed password and received plain password
+    console.log("Stored hashed password:", user.partnerRegistration.password);
+    console.log("Received plain password:", password);
+
+    // Compare the provided password with the stored hashed password
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.partnerRegistration.password
+    );
+
+    console.log("Password match:", passwordMatch);
+
+    if (passwordMatch) {
+      // Passwords match, handle successful login
+      const token = generateToken(user);
+      console.log("Token LogIn:", token);
+      const responseData = {
+        token,
+        user: {
+          userName: user.partnerRegistration.userName,
+          authority: ["USER"],
+          avatar: "",
+          email: user.partnerRegistration.email,
+        },
+      };
+      res.status(200).json({ success: true, ...responseData });
+    } else {
+      // Password incorrect, handle login failure
+      console.log("Password incorrect. Sending response:", {
         success: false,
         error: "Invalid credentials",
       });
