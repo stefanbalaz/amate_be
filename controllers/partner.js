@@ -3,6 +3,8 @@ const Partner = require("../schemas/partner");
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET;
 
+/* GENERATE TOKEN */
+
 const generateToken = (user) => {
   const payload = {
     userId: user._id,
@@ -20,6 +22,8 @@ const generateToken = (user) => {
   return token;
 };
 
+/* CREATE PARTNER */
+
 const createPartner = async (req, res) => {
   try {
     const newPartner = new Partner(req.body);
@@ -31,157 +35,7 @@ const createPartner = async (req, res) => {
   }
 };
 
-/* const registerPartner = async (req, res) => {
-  try {
-    const { userName, email, password } = req.body.partnerRegistration;
-    const newPartner = new Partner({
-      partnerRegistration: {
-        userName,
-        email,
-        password,
-      },
-      partnerRole: "customer",
-      partnerRelationType: "private",
-    });
-
-    const partner = await newPartner.save();
-
-    res.status(201).json({ success: true, data: partner });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}; */
-
-/* const registerPartner = async (req, res) => {
-  try {
-    const { userName, email, password } = req.body.partnerRegistration;
-
-    // Check if the username or email already exists
-    const existingUser = await Partner.findOne({
-      $or: [
-        { "partnerRegistration.userName": userName },
-        { "partnerRegistration.email": email },
-      ],
-    });
-
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ success: false, error: "User already exists" });
-    }
-
-    // Hash the password before saving to the database
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newPartner = new Partner({
-      partnerRegistration: {
-        userName,
-        email,
-        password: hashedPassword,
-      },
-      partnerRole: "customer",
-      partnerRelationType: "private",
-    });
-
-    const partner = await newPartner.save();
-
-    res.status(201).json({ success: true, data: partner });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}; */
-
-/* const registerPartner = async (req, res) => {
-  try {
-    const { userName, email, password } = req.body.partnerRegistration || {};
-
-    if (!userName || !email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Invalid request payload" });
-    }
-
-    // Check if the username or email already exists
-    const existingUser = await Partner.findOne({
-      $or: [
-        { "partnerRegistration.userName": userName },
-        { "partnerRegistration.email": email },
-      ],
-    });
-
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ success: false, error: "User already exists" });
-    }
-
-    // Hash the password before saving to the database
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newPartner = new Partner({
-      partnerRegistration: {
-        userName,
-        email,
-        password: hashedPassword,
-      },
-      partnerRole: "customer",
-      partnerRelationType: "private",
-    });
-
-    const partner = await newPartner.save();
-
-    res.status(201).json({ success: true, data: partner });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}; */
-
 /* REGISTER PARTNER */
-
-/* const registerPartner = async (req, res) => {
-  try {
-    const { userName, email, password } = req.body || {};
-
-    if (!userName || !email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Invalid request payload" });
-    }
-
-    // Check if the username or email already exists
-    const existingUser = await Partner.findOne({
-      $or: [
-        { "partnerRegistration.userName": userName },
-        { "partnerRegistration.email": email },
-      ],
-    });
-
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ success: false, error: "User already exists" });
-    }
-
-    // Hash the password before saving to the database
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newPartner = new Partner({
-      partnerRegistration: {
-        userName,
-        email,
-        password: hashedPassword,
-      },
-      partnerRole: "customer",
-      partnerRelationType: "private",
-    });
-
-    const partner = await newPartner.save();
-
-    res.status(201).json({ success: true, data: partner });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}; */
 
 const registerPartner = async (req, res) => {
   try {
@@ -249,20 +103,40 @@ const loginPartner = async (req, res) => {
   try {
     const { userName, password } = req.body;
 
-    // Find the user by userName or email and check the password
+    // Find the user by userName or email
     const user = await Partner.findOne({
       $or: [
         { "partnerRegistration.userName": userName },
         { "partnerRegistration.email": userName },
       ],
-      "partnerRegistration.password": password,
     });
 
     if (user) {
-      // User found, handle successful login
-      res.status(200).json({ success: true, data: "Login successful" });
+      // Compare the provided password with the stored hashed password
+      const passwordMatch = await bcrypt.compare(
+        password,
+        user.partnerRegistration.password
+      );
+
+      if (passwordMatch) {
+        // Passwords match, handle successful login
+        const token = generateToken(user);
+        const responseData = {
+          token,
+          user: {
+            userName: user.partnerRegistration.userName,
+            authority: ["USER"],
+            avatar: "",
+            email: user.partnerRegistration.email,
+          },
+        };
+        res.status(200).json({ success: true, ...responseData });
+      } else {
+        // Password incorrect, handle login failure
+        res.status(401).json({ success: false, error: "Invalid credentials" });
+      }
     } else {
-      // User not found or password incorrect, handle login failure
+      // User not found, handle login failure
       res.status(401).json({ success: false, error: "Invalid credentials" });
     }
   } catch (error) {
