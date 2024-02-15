@@ -99,14 +99,20 @@ const registerPartner = async (req, res) => {
 
 /* LOGIN PARTNER */
 
+/* LOGIN PARTNER */
+
 const loginPartner = async (req, res) => {
   try {
     const { userName, password } = req.body;
+
+    console.log("Received login request:", userName, password);
 
     // Find the user by userName or email
     const user = await Partner.findOne({
       "partnerRegistration.userName": userName,
     });
+
+    console.log("Found user:", user);
 
     if (user) {
       // Compare the provided password with the stored hashed password
@@ -114,6 +120,8 @@ const loginPartner = async (req, res) => {
         password,
         user.partnerRegistration.password
       );
+
+      console.log("Password match:", passwordMatch);
 
       if (passwordMatch) {
         // Passwords match, handle successful login
@@ -131,13 +139,22 @@ const loginPartner = async (req, res) => {
         res.status(200).json({ success: true, ...responseData });
       } else {
         // Password incorrect, handle login failure
+        console.log("Password incorrect. Sending response:", {
+          success: false,
+          error: "Invalid credentials",
+        });
         res.status(401).json({ success: false, error: "Invalid credentials" });
       }
     } else {
       // User not found, handle login failure
+      console.log("User not found. Sending response:", {
+        success: false,
+        error: "Invalid credentials",
+      });
       res.status(401).json({ success: false, error: "Invalid credentials" });
     }
   } catch (error) {
+    console.error("Error during login:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
