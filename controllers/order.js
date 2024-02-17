@@ -292,6 +292,8 @@ const updateOrder = async (req, res) => {
       }
     };
 
+    // console.log("Received updateFields:", updateFields);
+
     // Update orderStatus
     if (updateFields.orderStatus) {
       order.orderStatus = updateFields.orderStatus;
@@ -302,13 +304,30 @@ const updateOrder = async (req, res) => {
       order.orderPayment.status = updateFields.orderPayment.status;
     }
 
+    // Update invoiceNumber specifically
+    if (
+      updateFields.orderPayment &&
+      updateFields.orderPayment.invoiceNumber !== undefined
+    ) {
+      order.orderPayment.invoiceNumber =
+        updateFields.orderPayment.invoiceNumber;
+    } else if (
+      updateFields.orderPayment &&
+      updateFields.orderPayment.invoiceNumber === ""
+    ) {
+      // If the invoiceNumber is explicitly set to an empty string, you can set it to null or handle it as needed
+      order.orderPayment.invoiceNumber = null;
+    }
+
     // Update other nested properties if needed
     updateNestedFields(order.orderPayment, updateFields);
 
+    // console.log("Updated order:", order);
     await order.save();
 
     res.status(200).json({ success: true, data: order });
   } catch (error) {
+    console.error("Error during order update:", error);
     res.status(500).json({ error: error.message });
   }
 };
