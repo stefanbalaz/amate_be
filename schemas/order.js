@@ -67,7 +67,9 @@ const orderSchema = new Schema({
     },
     invoiceNumber: {
       type: String,
+      default: "",
     },
+
     dueDate: {
       type: Date,
     },
