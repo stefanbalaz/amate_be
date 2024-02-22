@@ -129,6 +129,12 @@ const orderSchema = new Schema({
       type: String,
       enum: ["BA", "PO"],
     },
+    deliveryNoteNumber: {
+      type: String,
+    },
+    deliveryNoteIssuanceDate: {
+      type: Date,
+    },
     orderDeliveryAddressId: {
       type: Schema.Types.ObjectId,
       ref: "Partner.partnerDeliveryAddress",
