@@ -30,4 +30,4 @@ const generateOrderNumber = async () => {
   return orderNumberInput;
 };
 
-module.exports = { generateOrderNumber };
+module.exports = { generateOrderNumber, generateRandomNumber };
