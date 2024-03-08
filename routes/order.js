@@ -5,6 +5,7 @@ const {
   getOneOrder,
   updateOrder,
 } = require("../controllers/order");
+
 const app = express.Router();
 
 app.route("/").post(createOrder).get(getAllOrders);
