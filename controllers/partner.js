@@ -192,13 +192,13 @@ const loginPartner = async (req, res) => {
     );
 
     // Log stored hashed password and received plain password
-    console.log("Stored hashed password:", user.partnerRegistration.password);
+    console.log("Stored hashed password:", user?.partnerRegistration.password);
     console.log("Received plain password:", password);
 
     // Compare the provided password with the stored hashed password
     const passwordMatch = await bcrypt.compare(
       password,
-      user.partnerRegistration.password
+      user?.partnerRegistration.password
     );
 
     console.log("Password match:", passwordMatch);
@@ -210,10 +210,10 @@ const loginPartner = async (req, res) => {
       const responseData = {
         token,
         user: {
-          userName: user.partnerRegistration.userName,
+          userName: user?.partnerRegistration.userName,
           authority: ["USER"],
           avatar: "",
-          email: user.partnerRegistration.email,
+          email: user?.partnerRegistration.email,
         },
       };
       res.status(200).json({ success: true, ...responseData });
