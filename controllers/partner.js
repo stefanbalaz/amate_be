@@ -217,6 +217,12 @@ const loginPartner = async (req, res) => {
         },
       };
       res.status(200).json({ success: true, ...responseData });
+
+      // TESTING LOGIN TIMEOUT
+      /*   setTimeout(() => {
+        // Simulate delay by waiting for 5 seconds before sending the response
+        res.status(200).json({ success: true, ...responseData });
+      }, 80000); // 5000 milliseconds = 5 seconds */
     } else {
       // Password incorrect, handle login failure
       console.log("Password incorrect. Sending response:", {

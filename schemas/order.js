@@ -150,7 +150,7 @@ const orderSchema = new Schema({
       quantity: {
         type: Number,
         default: 0,
-        required: true,
+        //  required: true,
       },
       batchID: {
         type: String,
@@ -158,7 +158,7 @@ const orderSchema = new Schema({
       volume: {
         type: Number,
         default: 0.3,
-        required: true,
+        // required: true,
       },
     },
   ],
@@ -167,7 +167,7 @@ const orderSchema = new Schema({
       type: String,
       enum: ["glass", "plastic"],
       default: "glass",
-      required: true,
+      // required: true,
     },
     containerMediumReceiptAmount: {
       type: Number,

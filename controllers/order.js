@@ -22,14 +22,14 @@ const createOrder = async (req, res) => {
     const orderNumberInput = await generateOrderNumber();
 
     // Fetch partner to filter active addresses
-    const partner = await Partner.findById(orderPartner.ID);
+    const partner = await Partner.findById(orderPartner?.ID);
 
     if (!partner) {
       return res.status(404).json({ error: "Partner not found" });
     }
 
     // Fetch merchant to filter active billing address
-    const merchant = await Merchant.findById(orderMerchant.ID);
+    const merchant = await Merchant.findById(orderMerchant?.ID);
 
     if (!merchant) {
       return res.status(404).json({ error: "Merchant not found" });
@@ -59,40 +59,40 @@ const createOrder = async (req, res) => {
     );
 
     const orderDeliveryExtended = {
-      method: orderDelivery.method,
-      methodDetail: orderDelivery.methodDetail,
-      date: orderDelivery.date,
-      region: orderDelivery.region,
+      method: orderDelivery?.method,
+      methodDetail: orderDelivery?.methodDetail,
+      date: orderDelivery?.date,
+      region: orderDelivery?.region,
       orderDeliveryAddressId: activeDeliveryAddress
-        ? activeDeliveryAddress._id
+        ? activeDeliveryAddress?._id
         : null,
     };
 
     const orderPaymentExtended = {
-      method: orderPayment.method,
-      record: orderPayment.record,
-      recordIssuanceDate: orderPayment.recordIssuanceDate,
-      invoiceNumber: orderPayment.invoiceNumber,
-      dueDate: orderPayment.dueDate,
-      status: orderPayment.status,
+      method: orderPayment?.method,
+      record: orderPayment?.record,
+      recordIssuanceDate: orderPayment?.recordIssuanceDate,
+      invoiceNumber: orderPayment?.invoiceNumber,
+      dueDate: orderPayment?.dueDate,
+      status: orderPayment?.status,
       orderPartnerBillingAddressId: activeBillingAddress
-        ? activeBillingAddress._id
+        ? activeBillingAddress?._id
         : null,
       partnerProductPriceId: activePrice ? activePrice._id : null,
     };
 
     const orderMerchantExtended = {
-      ID: orderMerchant.ID,
+      ID: orderMerchant?.ID,
       merchantBillingAddressId: activeMerchantBillingAddress
-        ? activeMerchantBillingAddress._id
+        ? activeMerchantBillingAddress?._id
         : null,
     };
 
     const order = await Order.create({
       orderNumber: orderNumberInput,
       orderPartner: {
-        ID: orderPartner.ID,
-        externalOrderNumber: orderPartner.externalOrderNumber,
+        ID: orderPartner?.ID,
+        externalOrderNumber: orderPartner?.externalOrderNumber,
       },
       orderStatus,
       orderCreationDate,
@@ -105,8 +105,8 @@ const createOrder = async (req, res) => {
     });
 
     if (order) {
-      await Partner.findByIdAndUpdate(orderPartner.ID, {
-        $push: { partnerOrders: order._id },
+      await Partner.findByIdAndUpdate(orderPartner?.ID, {
+        $push: { partnerOrders: order?._id },
       });
 
       //      console.log("controller partner", partner);
