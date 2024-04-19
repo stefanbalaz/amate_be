@@ -37,7 +37,7 @@ const createPartner = async (req, res) => {
 
 /* REGISTER PARTNER */
 
-const registerPartner = async (req, res) => {
+/* const registerPartner = async (req, res) => {
   try {
     const { userName, email, password } = req.body || {};
 
@@ -98,78 +98,72 @@ const registerPartner = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-};
+}; */
 
-/* LOGIN PARTNER */
-
-/* 
-const loginPartner = async (req, res) => {
+const registerPartner = async (req, res) => {
   try {
-    const { userName, password } = req.body;
+    const { userName, email, password, merchant } = req.body || {};
 
-    console.log("Received login request:", userName, password);
+    if (!userName || !email || !password || !merchant) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid request payload" });
+    }
 
-    // Find the user by userName or email
-    const user = await Partner.findOne({
-      "partnerRegistration.userName": userName,
+    // Check if the username or email already exists
+    const existingUser = await Partner.findOne({
+      $or: [
+        { "partnerRegistration.userName": userName },
+        { "partnerRegistration.email": email },
+      ],
     });
 
-    console.log("Found user:", user);
-
-    console.log(
-      "Hashed received plain password:",
-      await bcrypt.hash(password, 10)
-    );
-
-    if (user) {
-      // Log stored hashed password and received plain password
-      console.log("Stored hashed password:", user.partnerRegistration.password);
-      console.log("Received plain password:", password);
-
-      // Compare the provided password with the stored hashed password
-      const passwordMatch = await bcrypt.compare(
-        password,
-        user.partnerRegistration.password
-      );
-
-      console.log("Password match:", passwordMatch);
-
-      if (passwordMatch) {
-        // Passwords match, handle successful login
-        const token = generateToken(user);
-        console.log("Token LogIn:", token);
-        const responseData = {
-          token,
-          user: {
-            userName: user.partnerRegistration.userName,
-            authority: ["USER"],
-            avatar: "",
-            email: user.partnerRegistration.email,
-          },
-        };
-        res.status(200).json({ success: true, ...responseData });
-      } else {
-        // Password incorrect, handle login failure
-        console.log("Password incorrect. Sending response:", {
-          success: false,
-          error: "Invalid credentials",
-        });
-        res.status(401).json({ success: false, error: "Invalid credentials" });
-      }
-    } else {
-      // User not found, handle login failure
-      console.log("User not found. Sending response:", {
-        success: false,
-        error: "Invalid credentials",
-      });
-      res.status(401).json({ success: false, error: "Invalid credentials" });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ success: false, error: "User already exists" });
     }
+
+    // Hash the password before saving to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newPartner = new Partner({
+      partnerRegistration: {
+        userName,
+        email,
+        password: hashedPassword,
+      },
+      internalMerchantID: merchant,
+      partnerRole: "customer",
+      partnerRelationType: "private",
+    });
+
+    console.log("Received plain password during registration:", password);
+    console.log("Stored hashed password during registration:", hashedPassword);
+
+    const partner = await newPartner.save();
+
+    // Generate a token for the new partner
+    const token = generateToken(partner);
+    console.log("Token SignUp:", token);
+    // Create the modified response object with the token
+    const responseData = {
+      token,
+      user: {
+        userName: partner.partnerRegistration.userName,
+        authority: ["USER"],
+        avatar: "",
+        email: partner.partnerRegistration.email,
+        merchant,
+      },
+    };
+
+    // res.status(201).json({ success: true, data: responseData });
+    res.status(201).json({ success: true, ...responseData });
   } catch (error) {
-    console.error("Error during login:", error);
     res.status(500).json({ success: false, error: error.message });
   }
-}; 
-*/
+};
 
 /* LOGIN PARTNER */
 
@@ -214,6 +208,7 @@ const loginPartner = async (req, res) => {
           authority: ["USER"],
           avatar: "",
           email: user?.partnerRegistration.email,
+          partnerID: user?._id,
         },
       };
       res.status(200).json({ success: true, ...responseData });
