@@ -8,6 +8,7 @@ const createOrder = async (req, res) => {
   //  console.log("BODY", req.body);
   try {
     const {
+      orderNumber,
       orderPartner,
       orderStatus,
       orderCreationDate,
@@ -16,10 +17,11 @@ const createOrder = async (req, res) => {
       orderDelivery,
       orderProduct,
       orderPackaging,
-      orderMerchant,
     } = req.body;
 
-    const orderNumberInput = await generateOrderNumber();
+    const orderNumberInput = orderNumber
+      ? orderNumber
+      : await generateOrderNumber();
 
     // Fetch partner to filter active addresses
     const partner = await Partner.findById(orderPartner?.ID);
@@ -28,10 +30,14 @@ const createOrder = async (req, res) => {
       return res.status(404).json({ error: "Partner not found" });
     }
 
-    // Fetch merchant to filter active billing address
-    const merchant = await Merchant.findById(orderMerchant?.ID);
+    // Retrieve internalMerchantID from the partner data
+    const internalMerchantID = partner.internalMerchantID;
+    // console.log("internalMerchantID", internalMerchantID);
 
-    if (!merchant) {
+    // Retrieve orderMerchant based on internalMerchantID
+    const orderMerchant = await Merchant.findById(internalMerchantID);
+    //  console.log("orderMerchant", orderMerchant);
+    if (!orderMerchant) {
       return res.status(404).json({ error: "Merchant not found" });
     }
 
@@ -54,9 +60,10 @@ const createOrder = async (req, res) => {
     );
 
     // Filter active merchant billing address
-    const activeMerchantBillingAddress = merchant.merchantBillingAddress.find(
-      (address) => address.active === true
-    );
+    const activeMerchantBillingAddress =
+      orderMerchant.merchantBillingAddress.find(
+        (address) => address.active === true
+      );
 
     const orderDeliveryExtended = {
       method: orderDelivery?.method,
